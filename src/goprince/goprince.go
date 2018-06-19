@@ -22,9 +22,6 @@ func generateLuckyNumber(name string) int {
 }
 
 func main() {
-	router := httprouter.New()
-	router.GET("/", indexHandler)
-	router.GET("/lucky", luckyHandler)
 
 	// print env
 	env := os.Getenv("APP_ENV")
@@ -33,6 +30,10 @@ func main() {
 	} else {
 		log.Println("Running api server in dev mode")
 	}
+
+	router := httprouter.New()
+	router.GET("/", indexHandler)
+	router.GET("/lucky", luckyHandler)
 
 	http.ListenAndServe(":8080", router)
 }
