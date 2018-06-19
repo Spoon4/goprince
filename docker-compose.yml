@@ -1,0 +1,14 @@
+version: '2'
+
+services:
+  app:
+    build: .
+    command: make --no-print-directory run
+    volumes:
+      - ./src/goprince:/workspace/src/goprince
+    environment:
+      APP_ENV: dev
+    ports:
+      - "8080:8080"
+    logging:
+      driver: 'json-file'
