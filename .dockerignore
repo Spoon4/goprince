@@ -1,0 +1,9 @@
+README.md
+docker-compose.yml
+
+# IDE
+.idea
+
+# VCS
+.git
+.gitignore
