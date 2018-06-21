@@ -30,10 +30,10 @@ func generateHandler(context *gin.Context) {
 	// Get files from POST data and save them in temp dir
 	htmlFile, _ := context.FormFile("html")
 	cssFile, _ := context.FormFile("css")
-	outputFile := context.Params.ByName("filename")
 
 	htmlPath := filepath.Join(TMP_DIR, htmlFile.Filename)
 	cssPath := filepath.Join(TMP_DIR, cssFile.Filename)
+	outputFile := filepath.Join("/public/", context.Params.ByName("filename"))
 
 	context.SaveUploadedFile(htmlFile, htmlPath)
 	context.SaveUploadedFile(cssFile, cssPath)

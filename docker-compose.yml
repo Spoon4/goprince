@@ -6,6 +6,7 @@ services:
     command: make --no-print-directory run
     volumes:
       - ./src/goprince:/workspace/src/goprince
+      - ./public:/public
     environment:
       APP_ENV: dev
     ports:
