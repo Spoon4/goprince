@@ -1,29 +1,49 @@
 package main
 
 import (
+	"bytes"
+	"mime/multipart"
+	"net/http"
+	"net/http/httptest"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-// Unit test for generateLuckyNumber() using test tables.
-func TestGenerateLuckyNumber(t *testing.T) {
-	testCases := []struct {
-		name string
-		want int
-	}{
-		{
-			name: "surender",
-			want: 8,
-		},
-		{
-			name: "thakran",
-			want: 7,
-		},
-	}
-	for _, test := range testCases {
-		result := generateLuckyNumber(test.name)
+func TestRootRoute(t *testing.T) {
+	router := initRouter()
 
-		if result != test.want {
-			t.Errorf("generateLuckyNumber(%s) -> %d want %d", test.name, result, test.want)
-		}
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/", nil)
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, 200, w.Code)
+	assert.Equal(t, "This is the Prince RESTful API", w.Body.String())
+}
+
+func TestPrinceGenerateRoute(t *testing.T) {
+
+	buffer := new(bytes.Buffer)
+	mw := multipart.NewWriter(buffer)
+	ioWriter, err := mw.CreateFormFile("html", "test.html")
+
+	if assert.NoError(t, err) {
+		ioWriter.Write([]byte("bin/test.html"))
 	}
+	ioWriter, err = mw.CreateFormFile("css", "test.css")
+
+	if assert.NoError(t, err) {
+		ioWriter.Write([]byte("bin/test.css"))
+	}
+	mw.Close()
+
+	router := initRouter()
+
+	w := httptest.NewRecorder()
+	request, _ := http.NewRequest("POST", "/prince/generate/test.pdf", buffer)
+	request.Header.Set("Content-Type", mw.FormDataContentType())
+
+	router.ServeHTTP(w, request)
+
+	assert.Equal(t, 200, w.Code)
 }
