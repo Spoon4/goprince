@@ -31,6 +31,8 @@ $ make run-prod
 ## References
 
 * [Dockerized Development and Production Environment For Go (GoLang)][tarkan-article]
+* [Gin documentation][gin-doc]
 
 [prince]:           http://www.princexml.com
 [tarkan-article]:   https://www.surenderthakran.com/articles/tech/dockerized-development-and-production-environment-golang
+[gin-doc]:          https://github.com/gin-gonic/gin/blob/master/README.md
