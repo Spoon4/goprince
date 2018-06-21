@@ -1,5 +1,8 @@
 # goprince
 
+[![Docker Layers](https://images.microbadger.com/badges/image/spoon4/goprince.svg)][microbadger]
+[![Docker Build Status](https://img.shields.io/docker/build/spoon4/goprince.svg)][dockerstore]
+
 REST API in Go to use [Prince][prince].
 
 ## How to use?
@@ -38,6 +41,8 @@ $ make run-prod
 * [Dockerized Development and Production Environment For Go (GoLang)][tarkan-article]
 * [Gin documentation][gin-doc]
 
+[microbadger]:      https://microbadger.com/images/ardeveloppement/node
+[dockerstore]:      https://store.docker.com/community/images/ardeveloppement/node
 [prince]:           http://www.princexml.com
 [tarkan-article]:   https://www.surenderthakran.com/articles/tech/dockerized-development-and-production-environment-golang
 [gin-doc]:          https://github.com/gin-gonic/gin/blob/master/README.md
