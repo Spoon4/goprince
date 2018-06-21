@@ -2,7 +2,7 @@ version: '2'
 
 services:
   app:
-    build: .
+    image: spoon4/goprince:0.1
     command: make --no-print-directory run
     volumes:
       - ./src/goprince:/workspace/src/goprince
