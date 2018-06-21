@@ -1,19 +1,24 @@
 # goprince
 
 REST API in Go to use [Prince][prince].
+
 ## How to use?
 
 ### In Development
-
-Running our application in development is a very easy process thanks to the `docker-compose` command. 
-To build our application's docker image we run:
+ 
+To build the application's docker image run:
 ```bash
 $ make build-dev
 ```
 
-And to launch a docker container, we run:
+To launch a docker container run:
 ```bash
 $ make run-dev
+```
+
+To access the API browse at
+```text
+http://localhost:8080/
 ```
 
 ### In Production
