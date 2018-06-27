@@ -1,7 +1,7 @@
 package main
 
 import (
-	// "fmt"
+	//"fmt"
 	// "strings"
 	// "log"
 	"github.com/gin-gonic/gin"
@@ -22,8 +22,6 @@ func generateHandler(c *gin.Context) {
 
 	outputFile := c.Params.ByName("filename")
 
-	wrapper := NewWrapper()
-
 	// Get files from POST data and save them in temp dir
 	htmlFile, _ := c.FormFile("html")
 	htmlPath := filepath.Join(TMP_DIR, htmlFile.Filename)
@@ -32,6 +30,8 @@ func generateHandler(c *gin.Context) {
 	cssFile, _ := c.FormFile("css")
 	cssPath := filepath.Join(TMP_DIR, cssFile.Filename)
 	c.SaveUploadedFile(cssFile, cssPath)
+
+	wrapper := NewWrapper(htmlPath)
 
 	//cssFiles := c.MultipartForm().File["css[]"]
 	//if cssFiles != nil {
@@ -42,7 +42,7 @@ func generateHandler(c *gin.Context) {
 	//	}
 	//}
 
-	wrapper.Generate(htmlPath, outputFile)
+	dest := wrapper.Generate(outputFile)
 
 	// Remove temp files
 	os.Remove(htmlPath)
@@ -53,7 +53,7 @@ func generateHandler(c *gin.Context) {
 	c.Header("Content-Transfer-Encoding", "binary")
 	c.Header("Content-Disposition", "attachment; filename="+outputFile)
 	c.Header("Content-Type", "application/pdf")
-	c.File(outputFile)
+	c.File(dest)
 }
 
 // Gin router initialization.
