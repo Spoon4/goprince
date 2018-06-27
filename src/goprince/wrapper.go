@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"strconv"
@@ -23,10 +24,8 @@ type Wrapper interface {
 	SetLicenseKey(hash string)
 
 	SetLogFile(logPath string)
-	SetDebugMode(activate bool)
-	SetVerboseMode(activate bool)
 
-	Generate(intput string, output string)
+	Generate(outputFile string) string
 }
 
 // Struct are not exported
@@ -37,14 +36,15 @@ type Remap struct {
 
 // Define struct to configure and run Prince command line
 type Prince struct {
-	exePath string
+	exePath   string
+	inputFile string
+	inputType string
 
 	styleSheets     []string
 	scripts         []string
 	fileAttachments []string
 	remaps          []Remap
 
-	inputType  string
 	javascript bool
 	insecure   bool
 
@@ -56,47 +56,52 @@ type Prince struct {
 	verbose bool
 }
 
-func NewWrapper() Wrapper {
+func NewWrapper(inputFile string) Wrapper {
 
 	w := new(Prince)
 	w.exePath = PRINCE_BIN
+
+	w.inputFile = inputFile
+	w.inputType = "auto"
 
 	w.styleSheets = make([]string, 0, 50)
 	w.scripts = make([]string, 0, 50)
 	w.fileAttachments = make([]string, 0, 50)
 	w.remaps = make([]Remap, 0, 50)
 
-	w.SetHTML(true)
-
-	w.debug = true
-	w.verbose = true
+	isDev := os.Getenv("APP_ENV") != "production"
+	fmt.Println(isDev)
+	w.debug = isDev
+	w.verbose = isDev
 	return w
 }
 
-func (w *Prince) Generate(input string, output string) {
+func (w *Prince) Generate(outputFile string) string {
 
 	_, err := exec.LookPath(w.exePath)
 	if err != nil {
-		// return an error
-		return
+		fmt.Println(err.Error())
+		return err.Error()
 
 	}
 
-	outputFile := filepath.Join(OUTPUT_DEST, output)
+	outputPath := filepath.Join(OUTPUT_DEST, outputFile)
 
-	args := w.GetCommandLineArgs(outputFile)
-	args = append(args, input)
+	args := w.GetCommandLineArgs(outputPath)
+	args = append(args, w.inputFile)
 
 	_, err = exec.Command(w.exePath, args...).Output()
 
 	if nil != err {
 		fmt.Println(err.Error())
+		return err.Error()
 	}
+
+	return outputPath
 }
 
 func (w *Prince) GetCommandLineArgs(outputFile string) []string {
 
-	//args := make([]string, 0, cap(w.GetCommandLineArgsCount()))
 	args := make([]string, 0)
 
 	for _, stylesheet := range w.styleSheets {
@@ -143,45 +148,6 @@ func (w *Prince) GetCommandLineArgs(outputFile string) []string {
 	return args
 }
 
-func (w *Prince) GetCommandLineArgsCount() int {
-
-	argsLen := 0
-	argsLen += len(w.styleSheets) * 2
-	argsLen += len(w.scripts) * 2
-	argsLen += len(w.fileAttachments)
-	argsLen += len(w.remaps)
-
-	if "auto" != w.inputType {
-		argsLen++
-	}
-	if true == w.javascript {
-		argsLen++
-	}
-	if true == w.insecure {
-		argsLen++
-	}
-
-	// License
-	if "" != w.licenseKey {
-		argsLen++
-	}
-	if "" != w.licenseFile {
-		argsLen++
-	}
-
-	if "" != w.logFile {
-		argsLen++
-	}
-	if true == w.debug {
-		argsLen++
-	}
-	if true != w.verbose {
-		argsLen++
-	}
-
-	return int(argsLen)
-}
-
 // License management by file
 func (w *Prince) SetLicenseFile(file string) {
 	w.licenseFile = file
@@ -219,7 +185,7 @@ func (w *Prince) AddFileAttachment(file string) {
 func (w *Prince) ClearFileAttachments() {
 }
 
-// Define file input type
+// Define file input
 func (w *Prince) SetHTML(isHTML bool) {
 	if isHTML == true {
 		w.inputType = "html"
@@ -233,12 +199,4 @@ func (w *Prince) SetHTML(isHTML bool) {
 // messages, or '' to disable logging.
 func (w *Prince) SetLogFile(logPath string) {
 	w.logFile = logPath
-}
-
-func (w *Prince) SetDebugMode(activate bool) {
-	w.debug = activate
-}
-
-func (w *Prince) SetVerboseMode(activate bool) {
-	w.verbose = activate
 }
