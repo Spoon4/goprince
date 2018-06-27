@@ -1,5 +1,7 @@
 README.md
 docker-compose.yml
+public/
+docker/
 
 # IDE
 .idea
