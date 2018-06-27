@@ -10,6 +10,9 @@ build-dev:
 run-dev:
 	@docker-compose up
 
+sh:
+	@docker-compose exec app ash
+
 build-prod:
 	@docker build \
 	    -t goprince:v$(APP_VERSION) . \
