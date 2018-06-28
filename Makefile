@@ -1,8 +1,11 @@
 .SILENT:
 
-APP_VERSION=0.1
+APP_VERSION=`cat VERSION`
 
 include  ./Makefile.dist
+
+version:
+	@echo $(APP_VERSION)
 
 build-dev:
 	@docker-compose build
