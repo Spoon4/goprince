@@ -25,6 +25,17 @@ type Wrapper interface {
 
 	SetLogFile(logPath string)
 
+	SetPageSize(size string)
+	SetPageMargin(margin string)
+
+	SetPDFOutputIntent(profile string)
+	SetPDFProfile(profile string)
+	SetPDFTitle(title string)
+	SetPDFSubject(subject string)
+	SetPDFAuthor(author string)
+	SetPDFKeywords(keywords string)
+	SetPDFCreator(creator string)
+
 	Generate(outputFile string) string
 }
 
@@ -40,6 +51,9 @@ type Prince struct {
 	inputFile string
 	inputType string
 
+	pageSize string
+	pageMargin string
+
 	styleSheets     []string
 	scripts         []string
 	fileAttachments []string
@@ -50,6 +64,14 @@ type Prince struct {
 
 	licenseFile string
 	licenseKey  string
+
+	pdfOutputIntent string
+	pdfProfile string
+	pdfTitle string
+	pdfSubject string
+	pdfAuthor string
+	pdfKeywords string
+	pdfCreator string
 
 	logFile string
 	debug   bool
@@ -133,6 +155,28 @@ func (w *Prince) GetCommandLineArgs(outputFile string) []string {
 		args = append(args, "--license-file="+strconv.Quote(w.licenseFile))
 	}
 
+	if "" != w.pdfOutputIntent {
+		args = append(args, "--pdf-output-intent="+strconv.Quote(w.pdfOutputIntent))
+	}
+	if "" != w.pdfProfile {
+		args = append(args, "--pdf-profile="+strconv.Quote(w.pdfProfile))
+	}
+	if "" != w.pdfTitle {
+		args = append(args, "--pdf-title="+strconv.Quote(w.pdfTitle))
+	}
+	if "" != w.pdfSubject {
+		args = append(args, "--pdf-subject="+strconv.Quote(w.pdfSubject))
+	}
+	if "" != w.pdfAuthor {
+		args = append(args, "--pdf-author="+strconv.Quote(w.pdfAuthor))
+	}
+	if "" != w.pdfKeywords {
+		args = append(args, "--pdf-keywords="+strconv.Quote(w.pdfKeywords))
+	}
+	if "" != w.pdfCreator {
+		args = append(args, "--pdf-creator="+strconv.Quote(w.pdfCreator))
+	}
+
 	if "" != w.logFile {
 		args = append(args, "--log="+strconv.Quote(w.logFile))
 	}
@@ -192,6 +236,42 @@ func (w *Prince) SetHTML(isHTML bool) {
 	} else {
 		w.inputType = "xml"
 	}
+}
+
+func (w *Prince) SetPageSize(size string) {
+	w.pageSize = size
+}
+
+func (w *Prince) SetPageMargin(margin string) {
+	w.pageMargin = margin
+}
+
+func (w *Prince) SetPDFOutputIntent(profile string) {
+	w.pdfOutputIntent = profile
+}
+
+func (w *Prince) SetPDFProfile(profile string) {
+	w.pdfProfile = profile
+}
+
+func (w *Prince) SetPDFTitle(title string) {
+	w.pdfTitle = title
+}
+
+func (w *Prince) SetPDFSubject(subject string) {
+	w.pdfSubject = subject
+}
+
+func (w *Prince) SetPDFAuthor(author string) {
+	w.pdfAuthor = author
+}
+
+func (w *Prince) SetPDFKeywords(keywords string) {
+	w.pdfKeywords = keywords
+}
+
+func (w *Prince) SetPDFCreator(creator string) {
+	w.pdfCreator = creator
 }
 
 // Specify a file that Prince should use to log error/warning messages.
