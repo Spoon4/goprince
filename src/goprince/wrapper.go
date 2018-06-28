@@ -51,7 +51,7 @@ type Prince struct {
 	inputFile string
 	inputType string
 
-	pageSize string
+	pageSize   string
 	pageMargin string
 
 	styleSheets     []string
@@ -66,12 +66,12 @@ type Prince struct {
 	licenseKey  string
 
 	pdfOutputIntent string
-	pdfProfile string
-	pdfTitle string
-	pdfSubject string
-	pdfAuthor string
-	pdfKeywords string
-	pdfCreator string
+	pdfProfile      string
+	pdfTitle        string
+	pdfSubject      string
+	pdfAuthor       string
+	pdfKeywords     string
+	pdfCreator      string
 
 	logFile string
 	debug   bool
@@ -92,7 +92,6 @@ func NewWrapper(inputFile string) Wrapper {
 	w.remaps = make([]Remap, 0, 50)
 
 	isDev := os.Getenv("APP_ENV") != "production"
-	fmt.Println(isDev)
 	w.debug = isDev
 	w.verbose = isDev
 	return w

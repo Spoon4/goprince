@@ -20,7 +20,7 @@ func indexHandler(c *gin.Context) {
 // API handler to generate PDF from HTML files
 func generateHandler(c *gin.Context) {
 
-	outputFile := c.Params.ByName("filename")
+	outputFile := c.Param("filename")
 
 	// Get files from POST data and save them in temp dir
 	htmlFile, _ := c.FormFile("html")
@@ -53,7 +53,9 @@ func generateHandler(c *gin.Context) {
 	c.Header("Content-Description", "File Transfer")
 	c.Header("Content-Transfer-Encoding", "binary")
 	c.Header("Content-Disposition", "attachment; filename="+outputFile)
+	//c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", outputFile))
 	c.Header("Content-Type", "application/pdf")
+	//c.Header("Content-Type", "application/octet-stream")
 	c.File(dest)
 }
 
