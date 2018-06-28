@@ -62,11 +62,7 @@ func initRouter() *gin.Engine {
 
 	router := gin.Default()
 	router.GET("/", indexHandler)
-
-	prince := router.Group("/prince")
-	{
-		prince.POST("/generate/:filename", generateHandler)
-	}
+	router.POST("/generate/:filename", generateHandler)
 
 	return router
 }
