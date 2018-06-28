@@ -13,18 +13,24 @@ REST API in Go to use [Prince][prince].
 
 ##### Parameters
 
-* `filename` _string_: Name of the output PDF file
+|Parameter|Type|Description|
+|---|---|---|
+|`filename`|_string_|Name of the output PDF file|
 
 ##### Body
 
-* `css` _file_: CSS file to upload to pass to Prince
-* `html` _file_: HTML file to convert
+|Form field|Type|Description|
+|---|---|---|
+|`css`|_file_|CSS file to upload to pass to Prince|
+|`html`|_file_|HTML file to convert|
 
 ### Env vars
 
-* `APP_ENV`: `dev`|`production`
-* `LICENSE_FILE`: Path to Prince license file
-* `LICENSE_KEY`: Prince license hash key
+|Var|Description|
+|---|---|
+|`APP_ENV`| `dev` or `production`|
+|`LICENSE_FILE`|Path to Prince license file|
+|`LICENSE_FILE`|Prince license hash key|
 
 ## Development
 
