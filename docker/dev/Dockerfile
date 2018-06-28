@@ -24,11 +24,15 @@ VOLUME /public
 ENV GOPATH /go
 ENV PATH "$PATH:$GOPATH/bin"
 
+RUN mkdir -p $(GOPATH)/bin $(GOPATH)/pkg
+
 # Add Go dependencies
 RUN go get github.com/gin-gonic/gin
 RUN go get github.com/stretchr/testify/assert
+RUN go get github.com/cespare/reflex
 
 ADD ./ /$GOPATH
 WORKDIR $GOPATH
 
-RUN make --no-print-directory install
+RUN go get ./...
+RUN go install goprince

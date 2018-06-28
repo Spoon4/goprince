@@ -13,16 +13,12 @@ REST API in Go to use [Prince][prince].
 
 ##### Parameters
 
-|Parameter|Type|Description|
-|---|---|---|
-|`filename`|_string_|Name of the output PDF file|
+* `filename` _string_: Name of the output PDF file
 
 ##### Body
 
-|Form field|Type|Description|
-|---|---|---|
-|`css`|_file_|CSS file to upload to pass to Prince|
-|`html`|_file_|HTML file to convert|
+* `css` _file_: CSS file to upload to pass to Prince
+* `html` _file_: HTML file to convert
 
 ### Env vars
 
@@ -49,6 +45,11 @@ $ make run-dev
 To access the API browse at
 ```text
 http://localhost:8080/
+```
+
+To access the conteneur with shell
+```bash
+$ make sh
 ```
 
 ### In Production environment
