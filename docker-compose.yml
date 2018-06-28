@@ -5,7 +5,7 @@ services:
 #    image: spoon4/goprince:0.1
     build:
       context: .
-      dockerfile: docker/prod/Dockerfile
+      dockerfile: docker/dev/Dockerfile
     command: make --no-print-directory run
     volumes:
       - ./src/goprince:/go/src/goprince
@@ -20,7 +20,7 @@ services:
   debug:
     build:
       context: .
-      dockerfile: docker/dev/Dockerfile
+      dockerfile: docker/debug/Dockerfile
 #    entrypoint: dlv debug -l 0.0.0.0:2345 --headless=true --log=true -- server
     command: dlv debug --headless --listen=:2345 --log=true --api-version=2 -- server
     working_dir: /workspace/src/goprince

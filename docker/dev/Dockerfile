@@ -1,18 +1,34 @@
-FROM spoon4/goprince:0.1
+FROM golang:1.10-alpine3.7
+
+ARG app_env
+ENV APP_ENV $app_env
 
 RUN apk add --update --no-cache \
-    ca-certificates \
-    dpkg \
-    musl-dev \
-    libc6-compat \
+    make musl git g++ \
+    libxml2 pixman tiff giflib libpng lcms2 libjpeg-turbo libcurl libgomp \
+    msttcorefonts-installer fontconfig freetype \
     && rm -rf /var/cache/apk/* \
     && update-ms-fonts
 
-ENV PATH "$PATH:/usr/local/go/bin"
+# Install Prince
+ENV PRINCE_VERSION 12
 
-# Add Delve
-RUN go get -u github.com/derekparker/delve/cmd/dlv
+RUN wget -qO- https://www.princexml.com/download/prince-${PRINCE_VERSION}-alpine3.7-x86_64.tar.gz \
+        | tar xvz --strip-components=1 \
+    && printf "/usr\n" | ./install.sh \
+    && rm -Rf *
 
-WORKDIR $GOPATH/src/goprince
+RUN mkdir -p /public
+VOLUME /public
 
-CMD ["dlv", "debug", "--headless", "--listen=:2345", "--log=true", "--api-version=2", "goprince"]
+ENV GOPATH /go
+ENV PATH "$PATH:$GOPATH/bin"
+
+# Add Go dependencies
+RUN go get github.com/gin-gonic/gin
+RUN go get github.com/stretchr/testify/assert
+
+ADD ./ /$GOPATH
+WORKDIR $GOPATH
+
+RUN make --no-print-directory install

@@ -20,7 +20,7 @@ build-prod:
 	@docker build \
 	    -t goprince:$(APP_VERSION) \
 	    --build-arg app_env=production \
-	    .
+	    --no-cache .
 
 run-prod:
 	@docker run -it -d \
