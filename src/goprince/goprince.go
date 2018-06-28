@@ -32,6 +32,7 @@ func generateHandler(c *gin.Context) {
 	c.SaveUploadedFile(cssFile, cssPath)
 
 	wrapper := NewWrapper(htmlPath)
+	license(&wrapper)
 
 	//cssFiles := c.MultipartForm().File["css[]"]
 	//if cssFiles != nil {
@@ -54,6 +55,21 @@ func generateHandler(c *gin.Context) {
 	c.Header("Content-Disposition", "attachment; filename="+outputFile)
 	c.Header("Content-Type", "application/pdf")
 	c.File(dest)
+}
+
+// Manage Prince license
+// Prince key or file comes from env vars
+// LICENSE_KEY / LICENSE_FILE
+func license(wrapper *Wrapper) {
+	licenseFile := os.Getenv("LICENSE_FILE")
+	licenseKey := os.Getenv("LICENSE_KEY")
+
+	if "" != licenseFile {
+		(*wrapper).SetLicenseFile(licenseFile)
+	}
+	if "" != licenseKey {
+		(*wrapper).SetLicenseKey(licenseKey)
+	}
 }
 
 // Gin router initialization.
