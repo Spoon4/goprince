@@ -21,15 +21,14 @@ RUN wget -qO- https://www.princexml.com/download/prince-${PRINCE_VERSION}-alpine
 RUN mkdir -p /public
 VOLUME /public
 
-ENV GOPATH /workspace
+ENV GOPATH /go
 ENV PATH "$PATH:$GOPATH/bin"
 
 # Add Go dependencies
 RUN go get github.com/gin-gonic/gin
 RUN go get github.com/stretchr/testify/assert
 
-ADD ./ /workspace
+ADD ./ /$GOPATH
 WORKDIR $GOPATH
 
 RUN make --no-print-directory install
-#CMD make --no-print-directory run

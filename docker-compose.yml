@@ -1,11 +1,14 @@
-version: '2'
+version: '3'
 
 services:
   app:
-    image: spoon4/goprince:0.1
+#    image: spoon4/goprince:0.1
+    build:
+      context: .
+      dockerfile: docker/prod/Dockerfile
     command: make --no-print-directory run
     volumes:
-      - ./src/goprince:/workspace/src/goprince
+      - ./src/goprince:/go/src/goprince
       - ./public:/public
     environment:
       APP_ENV: dev
@@ -13,3 +16,24 @@ services:
       - "8080:8080"
     logging:
       driver: 'json-file'
+
+  debug:
+    build:
+      context: .
+      dockerfile: docker/dev/Dockerfile
+#    entrypoint: dlv debug -l 0.0.0.0:2345 --headless=true --log=true -- server
+    command: dlv debug --headless --listen=:2345 --log=true --api-version=2 -- server
+    working_dir: /workspace/src/goprince
+    volumes:
+      - ./src/goprince:/workspace/src/goprince
+      - ./public:/public
+    environment:
+      APP_ENV: dev
+    ports:
+      - "2345:2345"
+      - "8080:8080"
+    security_opt:
+      - "seccomp:unconfined"
+#      - "apparmor:unconfined"
+#    cap_add:
+#      - SYS_PTRACE
