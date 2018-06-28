@@ -40,7 +40,7 @@ func TestPrinceGenerateRoute(t *testing.T) {
 	router := initRouter()
 
 	w := httptest.NewRecorder()
-	request, _ := http.NewRequest("POST", "/prince/generate/test.pdf", buffer)
+	request, _ := http.NewRequest("POST", "/generate/test.pdf", buffer)
 	request.Header.Set("Content-Type", mw.FormDataContentType())
 
 	router.ServeHTTP(w, request)
