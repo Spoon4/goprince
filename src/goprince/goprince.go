@@ -1,9 +1,10 @@
 package main
 
 import (
-	//"fmt"
+	"fmt"
 	// "strings"
 	// "log"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"os"
@@ -22,26 +23,31 @@ func generateHandler(c *gin.Context) {
 
 	outputFile := c.Param("filename")
 
-	// Get files from POST data and save them in temp dir
-	htmlFile, _ := c.FormFile("html")
-	htmlPath := filepath.Join(TMP_DIR, htmlFile.Filename)
-	c.SaveUploadedFile(htmlFile, htmlPath)
+	htmlPath, err := getFormFile(c, "input_file", false)
 
-	cssFile, _ := c.FormFile("css")
-	cssPath := filepath.Join(TMP_DIR, cssFile.Filename)
-	c.SaveUploadedFile(cssFile, cssPath)
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+	}
 
 	wrapper := NewWrapper(htmlPath)
 	license(&wrapper)
 
-	//cssFiles := c.MultipartForm().File["css[]"]
-	//if cssFiles != nil {
-	//	for __, cssFile := range cssFile {
-	//		cssPath := filepath.Join(TMP_DIR, cssFile.Filename)
-	//		c.SaveUploadedFile(cssFile, cssPath)
-	wrapper.AddStyleSheet(cssPath)
-	//	}
-	//}
+	cssPath, err := getFormFile(c, "css_file", true)
+
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+	}
+
+	if cssPath != "" {
+		//cssFiles := c.MultipartForm().File["css[]"]
+		//if cssFiles != nil {
+		//	for __, cssFile := range cssFile {
+		//		cssPath := filepath.Join(TMP_DIR, cssFile.Filename)
+		//		c.SaveUploadedFile(cssFile, cssPath)
+		wrapper.AddStyleSheet(cssPath)
+		//	}
+		//}
+	}
 
 	dest := wrapper.Generate(outputFile)
 
@@ -63,6 +69,7 @@ func generateHandler(c *gin.Context) {
 // Prince key or file comes from env vars
 // LICENSE_KEY / LICENSE_FILE
 func license(wrapper *Wrapper) {
+
 	licenseFile := os.Getenv("LICENSE_FILE")
 	licenseKey := os.Getenv("LICENSE_KEY")
 
@@ -72,6 +79,23 @@ func license(wrapper *Wrapper) {
 	if "" != licenseKey {
 		(*wrapper).SetLicenseKey(licenseKey)
 	}
+}
+
+// Get files from POST data and save them in temp dir
+func getFormFile(c *gin.Context, parameter string, optional bool) (path string, err error) {
+
+	file, _ := c.FormFile(parameter)
+
+	if nil != file {
+		path := filepath.Join(TMP_DIR, file.Filename)
+		c.SaveUploadedFile(file, path)
+		return path, nil
+	} else {
+		if false == optional {
+			return "", errors.New(fmt.Sprintf("Parametre %s is not present in the form", parameter))
+		}
+	}
+	return "", nil
 }
 
 // Gin router initialization.

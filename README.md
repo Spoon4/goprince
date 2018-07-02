@@ -17,8 +17,8 @@ REST API in Go to use [Prince][prince].
 
 ##### Body
 
-* `css` _file_: CSS file to upload to pass to Prince
-* `html` _file_: HTML file to convert
+* `input_file` _file_: HTML file to convert (**required**)
+* `css_file` _file_: CSS file to upload to pass to Prince
 
 ### Env vars
 
