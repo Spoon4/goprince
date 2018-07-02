@@ -26,12 +26,12 @@ func TestPrinceGenerateRoute(t *testing.T) {
 	buffer := new(bytes.Buffer)
 	mw := multipart.NewWriter(buffer)
 
-	ioWriter, err := mw.CreateFormFile("html", "test.html")
+	ioWriter, err := mw.CreateFormFile("input_file", "test.html")
 	if assert.NoError(t, err) {
 		ioWriter.Write([]byte("bin/test.html"))
 	}
 
-	ioWriter, err = mw.CreateFormFile("css", "test.css")
+	ioWriter, err = mw.CreateFormFile("css_file", "test.css")
 	if assert.NoError(t, err) {
 		ioWriter.Write([]byte("bin/test.css"))
 	}
