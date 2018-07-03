@@ -10,9 +10,13 @@ import (
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
+	"io"
 )
 
-const TMP_DIR = "/tmp/"
+const (
+	TMP_DIR = "/tmp/"
+	LOG_DIR = "/var/log/goprince/"
+)
 
 // Default index handler
 func indexHandler(c *gin.Context) {
@@ -24,19 +28,14 @@ func generateHandler(c *gin.Context) {
 
 	outputFile := c.Param("filename")
 
-	if outputFile == "" {
-		c.String(http.StatusInternalServerError, "Filename not provided")
-		return
-	}
+	htmlPath, err := getFormFile(c, "input_file", false)
 
-	htmlPath, _ := getFormFile(c, "input_file", false)
-
-	if htmlPath == "" {
+	if err != nil {
 		c.String(http.StatusInternalServerError, "No file to convert")
 		return
 	}
 
-	wrapper := NewWrapper(htmlPath)
+	wrapper := NewWrapper(htmlPath, LOG_DIR)
 	license(&wrapper)
 
 	cssPath, err := getFormFile(c, "stylesheet", true)
@@ -47,14 +46,19 @@ func generateHandler(c *gin.Context) {
 	}
 
 	if cssPath != "" {
-		//cssFiles := c.MultipartForm().File["stylesheets[]"]
-		//if cssFiles != nil {
-		//	for __, cssFile := range cssFile {
-		//		cssPath := filepath.Join(TMP_DIR, cssFile.Filename)
-		//		c.SaveUploadedFile(cssFile, cssPath)
 		wrapper.AddStyleSheet(cssPath)
-		//	}
-		//}
+
+		//for multiple files upload
+		/*
+			cssFiles := c.MultipartForm().File["stylesheets[]"]
+			if cssFiles != nil {
+				for __, cssFile := range cssFile {
+					cssPath := filepath.Join(TMP_DIR, cssFile.Filename)
+					c.SaveUploadedFile(cssFile, cssPath)
+					wrapper.AddStyleSheet(cssPath)
+				}
+			}
+		*/
 	}
 
 	dest, err := wrapper.Generate(outputFile)
@@ -89,7 +93,6 @@ func generateHandler(c *gin.Context) {
 	default:
 		c.String(http.StatusCreated, dest)
 	}
-
 }
 
 // Manage Prince license
@@ -100,12 +103,8 @@ func license(wrapper *Wrapper) {
 	licenseFile := os.Getenv("LICENSE_FILE")
 	licenseKey := os.Getenv("LICENSE_KEY")
 
-	if "" != licenseFile {
-		(*wrapper).SetLicenseFile(licenseFile)
-	}
-	if "" != licenseKey {
-		(*wrapper).SetLicenseKey(licenseKey)
-	}
+	(*wrapper).SetLicenseFile(licenseFile)
+	(*wrapper).SetLicenseKey(licenseKey)
 }
 
 // Get files from POST data and save them in temp dir
@@ -142,7 +141,15 @@ func main() {
 	env := os.Getenv("APP_ENV")
 	if env == "production" {
 		gin.SetMode(gin.ReleaseMode)
+		// Disable Console Color, you don't need console color when writing the logs to file.
+		gin.DisableConsoleColor()
 	}
+
+	f, _ := os.Create(filepath.Join(LOG_DIR, "gin.log"))
+	gin.DefaultWriter = io.MultiWriter(f)
+
+	// Use the following code if you need to write the logs to file and console at the same time.
+	// gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
 
 	router := initRouter()
 	router.Run()
