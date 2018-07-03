@@ -22,7 +22,7 @@ REST API in Go to use [Prince][prince].
 
 ##### Query parameters
 
-* `output` _string_: 
+* `output` _string_ (optional): 
     * `stream`: returns bytes of the file
     * `file`: serves PDF file to download
     * _not present_: returns file output path
@@ -35,7 +35,7 @@ REST API in Go to use [Prince][prince].
 |`LICENSE_FILE`|Path to Prince license file|
 |`LICENSE_FILE`|Prince license hash key|
 
-## Development
+## Deployment
 
 ### In Development environment
  
@@ -70,6 +70,13 @@ And to launch a docker container for the image created above we run:
 ```bash
 $ make run-prod
 ```
+
+## Logs
+
+Both Prince and Gin are logged but in separated files.
+Logs are written in the container, in `/var/log/goprince` folder.
+
+In **development** environment, the Docker log directory is mapped on `logs/` folder by a volume.
 
 ## References
 
