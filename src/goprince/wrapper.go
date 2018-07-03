@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -78,10 +78,11 @@ type Prince struct {
 	verbose bool
 }
 
-func NewWrapper(inputFile string) Wrapper {
+func NewWrapper(inputFile string, logPath string) Wrapper {
 
 	w := new(Prince)
 	w.exePath = PRINCE_BIN
+	w.logFile = filepath.Join(logPath, "prince.log")
 
 	w.inputFile = inputFile
 	w.inputType = "auto"
@@ -101,7 +102,7 @@ func (w *Prince) Generate(outputFile string) (outputPath string, err error) {
 
 	_, err = exec.LookPath(w.exePath)
 	if err != nil {
-		fmt.Println(err.Error())
+		log.Println(err.Error())
 		return "", err
 
 	}
@@ -114,7 +115,7 @@ func (w *Prince) Generate(outputFile string) (outputPath string, err error) {
 	_, err = exec.Command(w.exePath, args...).Output()
 
 	if nil != err {
-		fmt.Println(err.Error())
+		log.Println(err.Error())
 		return "", err
 	}
 
@@ -177,7 +178,7 @@ func (w *Prince) GetCommandLineArgs(outputFile string) []string {
 	}
 
 	if "" != w.logFile {
-		args = append(args, "--log="+strconv.Quote(w.logFile))
+		args = append(args, "--log="+w.logFile)
 	}
 	if true == w.debug {
 		args = append(args, "--debug")
