@@ -10,6 +10,7 @@ services:
     volumes:
       - ./src/goprince:/go/src/goprince
       - ./public:/public
+      - ./logs:/var/log/goprince
     environment:
       APP_ENV: dev
     ports:

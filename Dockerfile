@@ -36,8 +36,9 @@ RUN wget -qO- https://www.princexml.com/download/prince-${PRINCE_VERSION}-alpine
     && printf "/usr\n" | ./src/install.sh \
     && rm -Rf src
 
-RUN mkdir -p /public
+RUN mkdir -p /public /var/log/goprince
 VOLUME /public
+VOLUME /var/log/goprince
 
 WORKDIR /app
 COPY --from=build /go/bin/goprince /app/

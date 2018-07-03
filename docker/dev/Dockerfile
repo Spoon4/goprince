@@ -18,8 +18,9 @@ RUN wget -qO- https://www.princexml.com/download/prince-${PRINCE_VERSION}-alpine
     && printf "/usr\n" | ./install.sh \
     && rm -Rf *
 
-RUN mkdir -p /public
+RUN mkdir -p /public /var/log/goprince
 VOLUME /public
+VOLUME /var/log/goprince
 
 ENV GOPATH /go
 ENV PATH "$PATH:$GOPATH/bin"
