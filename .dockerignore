@@ -2,6 +2,7 @@ README.md
 docker-compose.yml
 public/
 docker/
+logs/
 
 # IDE
 .idea
