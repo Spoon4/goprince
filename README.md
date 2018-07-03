@@ -18,7 +18,14 @@ REST API in Go to use [Prince][prince].
 ##### Body
 
 * `input_file` _file_: HTML file to convert (**required**)
-* `css_file` _file_: CSS file to upload to pass to Prince
+* `stylesheet` _file_: CSS file to upload to pass to Prince
+
+##### Query parameters
+
+* `output` _string_: 
+    * `stream`: returns bytes of the file
+    * `file`: serves PDF file to download
+    * _not present_: returns file output path
 
 ### Env vars
 

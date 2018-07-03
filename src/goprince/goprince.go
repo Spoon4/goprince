@@ -5,10 +5,11 @@ import (
 	// "strings"
 	// "log"
 	"errors"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"os"
 	"path/filepath"
+
+	"github.com/gin-gonic/gin"
 )
 
 const TMP_DIR = "/tmp/"
@@ -23,23 +24,30 @@ func generateHandler(c *gin.Context) {
 
 	outputFile := c.Param("filename")
 
-	htmlPath, err := getFormFile(c, "input_file", false)
+	if outputFile == "" {
+		c.String(http.StatusInternalServerError, "Filename not provided")
+		return
+	}
 
-	if err != nil {
-		c.String(http.StatusInternalServerError, err.Error())
+	htmlPath, _ := getFormFile(c, "input_file", false)
+
+	if htmlPath == "" {
+		c.String(http.StatusInternalServerError, "No file to convert")
+		return
 	}
 
 	wrapper := NewWrapper(htmlPath)
 	license(&wrapper)
 
-	cssPath, err := getFormFile(c, "css_file", true)
+	cssPath, err := getFormFile(c, "stylesheet", true)
 
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
+		return
 	}
 
 	if cssPath != "" {
-		//cssFiles := c.MultipartForm().File["css[]"]
+		//cssFiles := c.MultipartForm().File["stylesheets[]"]
 		//if cssFiles != nil {
 		//	for __, cssFile := range cssFile {
 		//		cssPath := filepath.Join(TMP_DIR, cssFile.Filename)
@@ -49,20 +57,39 @@ func generateHandler(c *gin.Context) {
 		//}
 	}
 
-	dest := wrapper.Generate(outputFile)
+	dest, err := wrapper.Generate(outputFile)
+
+	if nil != err {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
 
 	// Remove temp files
 	os.Remove(htmlPath)
 	os.Remove(cssPath)
 
-	//Seems this headers needed for some browsers (for example without this headers Chrome will download files as txt)
-	c.Header("Content-Description", "File Transfer")
-	c.Header("Content-Transfer-Encoding", "binary")
-	c.Header("Content-Disposition", "attachment; filename="+outputFile)
-	//c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", outputFile))
-	c.Header("Content-Type", "application/pdf")
-	//c.Header("Content-Type", "application/octet-stream")
-	c.File(dest)
+	output := c.DefaultQuery("output", "")
+	switch output {
+	case "file":
+		//Seems this headers needed for some browsers (for example without this headers Chrome will download files as txt)
+		c.Header("Content-Description", "File Transfer")
+		c.Header("Content-Transfer-Encoding", "binary")
+		c.Header("Content-Disposition", "attachment; filename="+outputFile)
+		//c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", outputFile))
+		c.Header("Content-Type", "application/pdf")
+		c.File(dest)
+		break
+	case "stream":
+		//Seems this headers needed for some browsers (for example without this headers Chrome will download files as txt)
+		c.Header("Content-Description", "File Transfer")
+		c.Header("Content-Transfer-Encoding", "binary")
+		c.Header("Content-Type", "application/octet-stream")
+		c.File(dest)
+		break
+	default:
+		c.String(http.StatusCreated, dest)
+	}
+
 }
 
 // Manage Prince license
@@ -92,7 +119,7 @@ func getFormFile(c *gin.Context, parameter string, optional bool) (path string, 
 		return path, nil
 	} else {
 		if false == optional {
-			return "", errors.New(fmt.Sprintf("Parametre %s is not present in the form", parameter))
+			return "", errors.New(fmt.Sprintf("Parameter %s is not present in the form", parameter))
 		}
 	}
 	return "", nil
@@ -105,7 +132,6 @@ func initRouter() *gin.Engine {
 	router := gin.Default()
 	router.GET("/", indexHandler)
 	router.POST("/generate/:filename", generateHandler)
-
 	return router
 }
 
