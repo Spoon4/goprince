@@ -36,7 +36,7 @@ type Wrapper interface {
 	SetPDFKeywords(keywords string)
 	SetPDFCreator(creator string)
 
-	Generate(outputFile string) string
+	Generate(outputFile string) (outputPath string, err error)
 }
 
 // Struct are not exported
@@ -97,16 +97,16 @@ func NewWrapper(inputFile string) Wrapper {
 	return w
 }
 
-func (w *Prince) Generate(outputFile string) string {
+func (w *Prince) Generate(outputFile string) (outputPath string, err error) {
 
-	_, err := exec.LookPath(w.exePath)
+	_, err = exec.LookPath(w.exePath)
 	if err != nil {
 		fmt.Println(err.Error())
-		return err.Error()
+		return "", err
 
 	}
 
-	outputPath := filepath.Join(OUTPUT_DEST, outputFile)
+	outputPath = filepath.Join(OUTPUT_DEST, outputFile)
 
 	args := w.GetCommandLineArgs(outputPath)
 	args = append(args, w.inputFile)
@@ -115,10 +115,10 @@ func (w *Prince) Generate(outputFile string) string {
 
 	if nil != err {
 		fmt.Println(err.Error())
-		return err.Error()
+		return "", err
 	}
 
-	return outputPath
+	return outputPath, nil
 }
 
 func (w *Prince) GetCommandLineArgs(outputFile string) []string {
