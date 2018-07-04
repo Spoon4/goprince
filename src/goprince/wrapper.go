@@ -77,6 +77,9 @@ type Prince struct {
 	logFile string
 	debug   bool
 	verbose bool
+
+	noWarnCssUnknown     bool
+	noWarnCssUnsupported bool
 }
 
 func NewWrapper(inputFile string, logPath string) Wrapper {
@@ -96,6 +99,9 @@ func NewWrapper(inputFile string, logPath string) Wrapper {
 	isDev := os.Getenv("APP_ENV") != "production"
 	w.debug = isDev
 	w.verbose = isDev
+
+	w.noWarnCssUnknown = !isDev
+	w.noWarnCssUnsupported = !isDev
 	return w
 }
 
@@ -186,6 +192,13 @@ func (w *Prince) GetCommandLineArgs(outputFile string) []string {
 	}
 	if true != w.verbose {
 		args = append(args, "--verbose")
+	}
+
+	if true != w.noWarnCssUnknown {
+		args = append(args, "--no-warn-css-unknown")
+	}
+	if true != w.noWarnCssUnsupported {
+		args = append(args, "--no-warn-css-unsupported")
 	}
 
 	args = append(args, "--structured-log=normal", "-o", outputFile)
