@@ -11,6 +11,7 @@ import (
 const (
 	PRINCE_BIN  = "prince"
 	OUTPUT_DEST = "/public/"
+	LOG_FILE    = "prince.log"
 )
 
 // Exporting interface instead of struct
@@ -82,7 +83,7 @@ func NewWrapper(inputFile string, logPath string) Wrapper {
 
 	w := new(Prince)
 	w.exePath = PRINCE_BIN
-	w.logFile = filepath.Join(logPath, "prince.log")
+	w.logFile = filepath.Join(logPath, LOG_FILE)
 
 	w.inputFile = inputFile
 	w.inputType = "auto"

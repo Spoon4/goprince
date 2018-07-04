@@ -1,21 +1,25 @@
 package main
 
 import (
-	"fmt"
-	// "strings"
-	// "log"
 	"errors"
+	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
 
+	"flag"
 	"github.com/gin-gonic/gin"
 	"io"
 )
 
 const (
-	TMP_DIR = "/tmp/"
-	LOG_DIR = "/var/log/goprince/"
+	TMP_DIR         = "/tmp/"
+	DEFAULT_LOG_DIR = "/var/log/goprince/"
+)
+
+var (
+	logDir *string
+	stdout *bool
 )
 
 // Default index handler
@@ -35,7 +39,7 @@ func generateHandler(c *gin.Context) {
 		return
 	}
 
-	wrapper := NewWrapper(htmlPath, LOG_DIR)
+	wrapper := NewWrapper(htmlPath, DEFAULT_LOG_DIR)
 	license(&wrapper)
 
 	cssPath, err := getFormFile(c, "stylesheet", true)
@@ -47,19 +51,19 @@ func generateHandler(c *gin.Context) {
 
 	if cssPath != "" {
 		wrapper.AddStyleSheet(cssPath)
-
-		//for multiple files upload
-		/*
-			cssFiles := c.MultipartForm().File["stylesheets[]"]
-			if cssFiles != nil {
-				for __, cssFile := range cssFile {
-					cssPath := filepath.Join(TMP_DIR, cssFile.Filename)
-					c.SaveUploadedFile(cssFile, cssPath)
-					wrapper.AddStyleSheet(cssPath)
-				}
-			}
-		*/
 	}
+
+	//for multiple files upload
+	/*
+		cssFiles := c.MultipartForm().File["stylesheets[]"]
+		if cssFiles != nil {
+			for __, cssFile := range cssFiles {
+				cssPath := filepath.Join(TMP_DIR, cssFile.Filename)
+				c.SaveUploadedFile(cssFile, cssPath)
+				wrapper.AddStyleSheet(cssPath)
+			}
+		}
+	*/
 
 	dest, err := wrapper.Generate(outputFile)
 
@@ -135,21 +139,33 @@ func initRouter() *gin.Engine {
 }
 
 // Main entrypoint
-// Set gin release mode if APP_ENV var is set on 'production'
+// Set gin in release mode if APP_ENV var is set on 'production'
 func main() {
+
+	showHelp := flag.Bool("help", false, "Show this message.")
+	logDir = flag.String("log-dir", DEFAULT_LOG_DIR, "Directory where log files must be stored.")
+	stdout = flag.Bool("stdout", true, "If set, logs are displayed on stdout.")
+	flag.Parse()
+
+	if *showHelp == true {
+		flag.PrintDefaults()
+		os.Exit(0)
+	}
+
+	f, _ := os.Create(filepath.Join(*logDir, "gin.log"))
+
+	if *stdout == true {
+		gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
+	} else {
+		// Disable Console Color, you don't need console color when writing the logs to file.
+		gin.DisableConsoleColor()
+		gin.DefaultWriter = io.MultiWriter(f)
+	}
 
 	env := os.Getenv("APP_ENV")
 	if env == "production" {
 		gin.SetMode(gin.ReleaseMode)
-		// Disable Console Color, you don't need console color when writing the logs to file.
-		gin.DisableConsoleColor()
 	}
-
-	f, _ := os.Create(filepath.Join(LOG_DIR, "gin.log"))
-	gin.DefaultWriter = io.MultiWriter(f)
-
-	// Use the following code if you need to write the logs to file and console at the same time.
-	// gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
 
 	router := initRouter()
 	router.Run()

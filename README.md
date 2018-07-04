@@ -3,39 +3,58 @@
 [![Docker Layers](https://images.microbadger.com/badges/image/spoon4/goprince.svg)][microbadger]
 [![Docker Build Status](https://img.shields.io/docker/build/spoon4/goprince.svg)][dockerstore]
 
-REST API in Go to use [Prince][prince].
+Convert HTML files to PDF with [Prince][prince] through an API.
 
 ## How to use?
 
-### Routes
+```bash
+$ goprince [--help] [--log-dir=/my/directory/] [--stdout]
+```
 
-#### `POST` /generate/{filename}
+### Command line options
 
-##### Parameters
+* `--help`: show help
+* `--log-dir`: set Gin and Prince log directory. Default `/var/log/goprince`
+* `--stdout`: if given, Gin also logs on stdout
+
+## API
+
+### `POST` /generate/{filename}
+
+#### Parameters
 
 * `filename` _string_: Name of the output PDF file
 
-##### Body
+#### Body
 
 * `input_file` _file_: HTML file to convert (**required**)
 * `stylesheet` _file_: CSS file to upload to pass to Prince
 
-##### Query parameters
+#### Query parameters
 
 * `output` _string_ (optional): 
     * `stream`: returns bytes of the file
     * `file`: serves PDF file to download
     * _not present_: returns file output path
 
-### Env vars
+## Env vars
 
 |Var|Description|
 |---|---|
-|`APP_ENV`| `dev` or `production`|
+|`APP_ENV`| `dev` / `production`|
 |`LICENSE_FILE`|Path to Prince license file|
 |`LICENSE_FILE`|Prince license hash key|
 
+## Logs
+
+Both Prince and Gin are logged in separated files.
+Logs are written in the container, in `/var/log/goprince` folder.
+
+In **development** environment, the Docker log directory is mapped on `logs/` folder by a volume in [docker-compose.yml](docker-compose.yml).
+
 ## Deployment
+
+:warning: You need to increment number in [VERSION](version) file to increment Docker's image tag.
 
 ### In Development environment
  
@@ -70,13 +89,6 @@ And to launch a docker container for the image created above we run:
 ```bash
 $ make run-prod
 ```
-
-## Logs
-
-Both Prince and Gin are logged but in separated files.
-Logs are written in the container, in `/var/log/goprince` folder.
-
-In **development** environment, the Docker log directory is mapped on `logs/` folder by a volume.
 
 ## References
 
