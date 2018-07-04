@@ -54,8 +54,6 @@ In **development** environment, the Docker log directory is mapped on `logs/` fo
 
 ## Deployment
 
-:warning: You need to increment number in [VERSION](version) file to increment Docker's image tag.
-
 ### In Development environment
  
 To build the application's docker image run:
@@ -80,15 +78,18 @@ $ make sh
 
 ### In Production environment
 
-We can build a docker image for our go application by running:
+You can build a Docker image for your go application by running:
+
 ```bash
 $ make build-prod
 ```
+:warning: You need to increment number in [VERSION](version) file to increment Docker's image tag.
 
 And to launch a docker container for the image created above we run:
 ```bash
 $ make run-prod
 ```
+
 
 ## References
 
