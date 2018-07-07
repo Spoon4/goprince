@@ -1,6 +1,9 @@
 package main
 
 import (
+	"errors"
+	"fmt"
+	"io"
 	"log"
 	"os"
 	"os/exec"
@@ -77,12 +80,13 @@ type Prince struct {
 	logFile string
 	debug   bool
 	verbose bool
+	stdout  bool
 
 	noWarnCssUnknown     bool
 	noWarnCssUnsupported bool
 }
 
-func NewWrapper(inputFile string, logPath string) Wrapper {
+func NewWrapper(inputFile string, logPath string, stdout bool) Wrapper {
 
 	w := new(Prince)
 	w.exePath = PRINCE_BIN
@@ -99,6 +103,7 @@ func NewWrapper(inputFile string, logPath string) Wrapper {
 	isDev := os.Getenv("APP_ENV") != "production"
 	w.debug = isDev
 	w.verbose = isDev
+	w.stdout = stdout
 
 	w.noWarnCssUnknown = !isDev
 	w.noWarnCssUnsupported = !isDev
@@ -119,7 +124,21 @@ func (w *Prince) Generate(outputFile string) (outputPath string, err error) {
 	args := w.GetCommandLineArgs(outputPath)
 	args = append(args, w.inputFile)
 
-	_, err = exec.Command(w.exePath, args...).Output()
+	logWriter, err := w.SetLogger()
+
+	if nil != err {
+		log.Println(err.Error())
+		return "", err
+	}
+
+	cmd := exec.Command(w.exePath, args...)
+
+	if w.stdout {
+		cmd.Stdout = logWriter
+		cmd.Stderr = logWriter
+	}
+
+	err = cmd.Run()
 
 	if nil != err {
 		log.Println(err.Error())
@@ -129,6 +148,27 @@ func (w *Prince) Generate(outputFile string) (outputPath string, err error) {
 	return outputPath, nil
 }
 
+// Set log file and create writer for command line output
+// If stdout property is set to true, output is also redirected to stdout
+func (w *Prince) SetLogger() (writer io.Writer, err error) {
+
+	f, err := os.OpenFile(w.logFile, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("Error opening file: %v", err))
+	}
+
+	if w.stdout {
+		writer = io.MultiWriter(f, os.Stdout)
+	} else {
+		writer = io.Writer(f)
+	}
+	return writer, nil
+}
+
+// Compute Prince command line arguments in a single array
+// outputFile: filename of the output file
+// Return the array of arguments
 func (w *Prince) GetCommandLineArgs(outputFile string) []string {
 
 	args := make([]string, 0)
