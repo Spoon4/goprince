@@ -18,8 +18,8 @@ const (
 )
 
 var (
-	logDir *string
-	stdout *bool
+	logDir string
+	stdout bool
 )
 
 // Default index handler
@@ -39,7 +39,7 @@ func generateHandler(c *gin.Context) {
 		return
 	}
 
-	wrapper := NewWrapper(htmlPath, DEFAULT_LOG_DIR)
+	wrapper := NewWrapper(htmlPath, logDir, stdout)
 	license(&wrapper)
 
 	cssPath, err := getFormFile(c, "stylesheet", true)
@@ -142,19 +142,21 @@ func initRouter() *gin.Engine {
 // Set gin in release mode if APP_ENV var is set on 'production'
 func main() {
 
-	showHelp := flag.Bool("help", false, "Show this message.")
-	logDir = flag.String("log-dir", DEFAULT_LOG_DIR, "Directory where log files must be stored.")
-	stdout = flag.Bool("stdout", true, "If set, logs are displayed on stdout.")
-	flag.Parse()
+	var showHelp bool
+	flag.BoolVar(&showHelp, "help", false, "Show this message.")
 
-	if *showHelp == true {
+	if showHelp {
 		flag.PrintDefaults()
 		os.Exit(0)
 	}
 
-	f, _ := os.Create(filepath.Join(*logDir, "gin.log"))
+	flag.StringVar(&logDir, "log-dir", DEFAULT_LOG_DIR, "Directory where log files must be stored.")
+	flag.BoolVar(&stdout, "stdout", true, "If set, logs are displayed on stdout.")
+	flag.Parse()
 
-	if *stdout == true {
+	f, _ := os.Create(filepath.Join(logDir, "gin.log"))
+
+	if stdout {
 		gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
 	} else {
 		// Disable Console Color, you don't need console color when writing the logs to file.

@@ -15,7 +15,7 @@ $ goprince [--help] [--log-dir=/my/directory/] [--stdout]
 
 * `--help`: show help
 * `--log-dir`: set Gin and Prince log directory. Default `/var/log/goprince`
-* `--stdout`: if given, Gin also logs on stdout
+* `--stdout`: if given, Gin and Prince also log on stdout
 
 ## API
 
