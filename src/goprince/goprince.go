@@ -13,7 +13,6 @@ import (
 	"log"
 	"os/signal"
 	"syscall"
-	"log"
 )
 
 const (
@@ -21,6 +20,7 @@ const (
 	DEFAULT_LOG_DIR = "/var/log/goprince/"
 )
 
+// shared vars
 var (
 	logDir string
 	stdout bool
@@ -146,6 +146,7 @@ func initRouter() *gin.Engine {
 // Set gin in release mode if APP_ENV var is set on 'production'
 func main() {
 
+	// display help if needed
 	var showHelp bool
 	flag.BoolVar(&showHelp, "help", false, "Show this message.")
 
@@ -154,12 +155,14 @@ func main() {
 		os.Exit(0)
 	}
 
+	// get command line args/options
 	var port int
 	flag.StringVar(&logDir, "log-dir", DEFAULT_LOG_DIR, "Directory where log files must be stored.")
 	flag.BoolVar(&stdout, "stdout", true, "If set, logs are displayed on stdout.")
 	flag.IntVar(&port, "port", 8080, "Set Gin listening port")
 	flag.Parse()
 
+	// configure Gin logging and create log file
 	f, _ := os.Create(filepath.Join(logDir, "gin.log"))
 
 	if stdout {
@@ -170,6 +173,7 @@ func main() {
 		gin.DefaultWriter = io.MultiWriter(f)
 	}
 
+	// set application environement from env var
 	env := os.Getenv("APP_ENV")
 	if env == "production" {
 		gin.SetMode(gin.ReleaseMode)
