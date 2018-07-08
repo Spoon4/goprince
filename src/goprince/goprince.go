@@ -10,6 +10,7 @@ import (
 	"flag"
 	"github.com/gin-gonic/gin"
 	"io"
+	"log"
 	"os/signal"
 	"syscall"
 	"log"
@@ -184,7 +185,7 @@ func main() {
 
 	go func() {
 		sig := <-gracefulStop
-		fmt.Printf("caught sig: %+v", sig)
+		log.Printf("caught sig: %+v", sig)
 		os.Exit(0)
 	}()
 
