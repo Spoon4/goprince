@@ -10,6 +10,8 @@ import (
 	"flag"
 	"github.com/gin-gonic/gin"
 	"io"
+	"os/signal"
+	"syscall"
 	"log"
 )
 
@@ -172,7 +174,21 @@ func main() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
+	// initialize Gin API routes
 	router := initRouter()
+
+	// manage signals to gracefully stop the application
+	var gracefulStop = make(chan os.Signal)
+	signal.Notify(gracefulStop, syscall.SIGTERM)
+	signal.Notify(gracefulStop, syscall.SIGINT)
+
+	go func() {
+		sig := <-gracefulStop
+		fmt.Printf("caught sig: %+v", sig)
+		os.Exit(0)
+	}()
+
+	// listen for HTTP requests
 	log.Println(port)
 	router.Run(fmt.Sprintf(":%d", port))
 }
