@@ -8,7 +8,7 @@ Convert HTML files to PDF with [Prince][prince] through an API.
 ## How to use?
 
 ```bash
-$ goprince [--help] [--log-dir=/my/directory/] [--stdout]
+$ goprince [--help] [--log-dir=/my/directory/] [--stdout] [--port 8080]
 ```
 
 ### Command line options
@@ -16,6 +16,7 @@ $ goprince [--help] [--log-dir=/my/directory/] [--stdout]
 * `--help`: show help
 * `--log-dir`: set Gin and Prince log directory. Default `/var/log/goprince`
 * `--stdout`: if given, Gin and Prince also log on stdout
+* `--port`: set port listening on. Default `8080`
 
 ## API
 

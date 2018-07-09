@@ -1,6 +1,7 @@
 .SILENT:
 
 APP_VERSION=`cat VERSION`
+GOPRINCE_PRODUCTION_PORT=80
 
 include  ./Makefile.dist
 
@@ -23,7 +24,12 @@ build-prod:
 	    --no-cache .
 
 run-prod:
-	@docker run -it -d \
+	docker run -it \
 	    --name goprince_1 \
 	    --net=host \
-	    goprince:$(APP_VERSION)
+	    --volume $(pwd)/src/goprince:/go/src/goprince \
+      	--volume $(pwd)/public:/public \
+		--volume $(pwd)/logs:/var/log/goprince \
+		--publish 80:80 \
+	    goprince:$(APP_VERSION) \
+	    sh -c "goprince --port 80"
