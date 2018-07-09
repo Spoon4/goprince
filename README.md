@@ -98,8 +98,8 @@ $ make run-prod
 * [Gin documentation][gin-doc]
 * [How to debug Golang applications inside Docker containers using Delve][go-remote-debug]
 
-[microbadger]:      https://microbadger.com/images/ardeveloppement/node
-[dockerstore]:      https://store.docker.com/community/images/ardeveloppement/node
+[microbadger]:      https://microbadger.com/images/spoon4/goprince
+[dockerstore]:      https://store.docker.com/community/images/spoon4/goprince
 [prince]:           http://www.princexml.com
 [tarkan-article]:   https://www.surenderthakran.com/articles/tech/dockerized-development-and-production-environment-golang
 [gin-doc]:          https://github.com/gin-gonic/gin/blob/master/README.md

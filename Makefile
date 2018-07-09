@@ -19,17 +19,18 @@ sh:
 
 build-prod:
 	@docker build \
-	    -t goprince:$(APP_VERSION) \
+	    -t spoon4/goprince:$(APP_VERSION) \
 	    --build-arg app_env=production \
 	    --no-cache .
 
 run-prod:
 	docker run -it \
+		--env APP_ENV=production \
 	    --name goprince_1 \
 	    --net=host \
 	    --volume $(pwd)/src/goprince:/go/src/goprince \
       	--volume $(pwd)/public:/public \
 		--volume $(pwd)/logs:/var/log/goprince \
 		--publish 80:80 \
-	    goprince:$(APP_VERSION) \
+	    spoon4/goprince:$(APP_VERSION) \
 	    sh -c "goprince --port 80"
