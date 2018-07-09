@@ -10,6 +10,7 @@ import (
 	"flag"
 	"github.com/gin-gonic/gin"
 	"io"
+	"log"
 )
 
 const (
@@ -150,8 +151,10 @@ func main() {
 		os.Exit(0)
 	}
 
+	var port int
 	flag.StringVar(&logDir, "log-dir", DEFAULT_LOG_DIR, "Directory where log files must be stored.")
 	flag.BoolVar(&stdout, "stdout", true, "If set, logs are displayed on stdout.")
+	flag.IntVar(&port, "port", 8080, "Set Gin listening port")
 	flag.Parse()
 
 	f, _ := os.Create(filepath.Join(logDir, "gin.log"))
@@ -170,5 +173,6 @@ func main() {
 	}
 
 	router := initRouter()
-	router.Run()
+	log.Println(port)
+	router.Run(fmt.Sprintf(":%d", port))
 }
