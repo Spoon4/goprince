@@ -44,7 +44,7 @@ $ goprince [--help] [--log-dir=/my/directory/] [--stdout] [--port 8080]
 |---|---|
 |`APP_ENV`| `dev` / `production`|
 |`LICENSE_FILE`|Path to Prince license file|
-|`LICENSE_FILE`|Prince license hash key|
+|`LICENSE_KEY`|Prince license hash key|
 
 ## Logs
 

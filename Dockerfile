@@ -8,7 +8,7 @@ RUN apk add --update --no-cache \
     && rm -rf /var/cache/apk/*
 
 ENV GOPATH /go
-ENV PATH "$PATH:$GOPATH/bin"
+#ENV PATH "$PATH:$GOPATH/bin"
 
 # Add Go dependencies
 RUN go get github.com/gin-gonic/gin
@@ -40,7 +40,12 @@ RUN mkdir -p /public /var/log/goprince
 VOLUME /public
 VOLUME /var/log/goprince
 
-WORKDIR /app
-COPY --from=build /go/bin/goprince /app/
+WORKDIR /
+COPY --from=build /go/bin/goprince /usr/local/bin
 
-ENTRYPOINT ./goprince
+ADD entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
+
+CMD ["--help"]
