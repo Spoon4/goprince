@@ -26,9 +26,9 @@ build-prod:
 run-prod:
 	docker run -it \
 		--env APP_ENV=production \
-	    --name goprince_1 \
-	    --net=host \
-      	--volume $(pwd)/public:/public \
+		--name goprince_1 \
+		--net=host \
+		--volume $(pwd)/public:/public \
 		--volume $(pwd)/logs:/var/log/goprince \
 		--publish 80:80 \
-	    spoon4/goprince:$(APP_VERSION) --port 80
+		spoon4/goprince:$(APP_VERSION) --port 80
