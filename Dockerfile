@@ -8,7 +8,6 @@ RUN apk add --update --no-cache \
     && rm -rf /var/cache/apk/*
 
 ENV GOPATH /go
-#ENV PATH "$PATH:$GOPATH/bin"
 
 # Add Go dependencies
 RUN go get github.com/gin-gonic/gin
@@ -47,5 +46,3 @@ ADD entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
-
-CMD ["--help"]

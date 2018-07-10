@@ -194,5 +194,6 @@ func main() {
 	}()
 
 	// listen for HTTP requests
+	log.Println(fmt.Sprintf("Goprince is listening on port %d...", port))
 	router.Run(fmt.Sprintf(":%d", port))
 }
