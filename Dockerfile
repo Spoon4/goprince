@@ -12,10 +12,13 @@ ENV GOPATH /go
 # Add Go dependencies
 RUN go get github.com/gin-gonic/gin
 RUN go get github.com/stretchr/testify/assert
+RUN go get github.com/Azure/azure-storage-blob-go/2016-05-31/azblob
+RUN go get git.openstack.org/openstack/golang-client
 
 ADD ./ /$GOPATH
 WORKDIR $GOPATH
 
+# Install Prince
 RUN go install goprince
 
 FROM alpine:3.7
@@ -26,7 +29,6 @@ RUN apk add --update --no-cache \
     && rm -rf /var/cache/apk/* \
     && update-ms-fonts
 
-# Install Prince
 ENV PRINCE_VERSION 12
 
 RUN mkdir /src

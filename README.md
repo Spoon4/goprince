@@ -55,6 +55,9 @@ In **development** environment, the Docker log directory is mapped on `logs/` fo
 
 ## Deployment
 
+PHPStorm doesn't handle Docker packages..so you have to install all packages on your host system :vomit: ...
+Use Golang [applications structure][app-structure] to manage as well a as possible package requirements.
+
 ### In Development environment
  
 To build the application's docker image run:
@@ -97,10 +100,13 @@ $ make run-prod
 * [Dockerized Development and Production Environment For Go (GoLang)][tarkan-article]
 * [Gin documentation][gin-doc]
 * [How to debug Golang applications inside Docker containers using Delve][go-remote-debug]
+* [Golang: Gracefully stop application][kpbird-graceful]
 
 [microbadger]:      https://microbadger.com/images/spoon4/goprince
 [dockerstore]:      https://store.docker.com/community/images/spoon4/goprince
 [prince]:           http://www.princexml.com
+[app-structure]:    https://golang.org/doc/code.html
 [tarkan-article]:   https://www.surenderthakran.com/articles/tech/dockerized-development-and-production-environment-golang
 [gin-doc]:          https://github.com/gin-gonic/gin/blob/master/README.md
 [go-remote-debug]:  https://mikemadisonweb.github.io/2018/06/14/go-remote-debug/
+[kpbird-graceful]:  https://medium.com/@kpbird/golang-gracefully-stop-application-23c2390bb212

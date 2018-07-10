@@ -28,6 +28,9 @@ ENV PATH "$PATH:$GOPATH/bin"
 # Add Go dependencies
 RUN go get github.com/gin-gonic/gin
 RUN go get github.com/stretchr/testify/assert
+RUN go get github.com/Azure/azure-storage-blob-go/2016-05-31/azblob
+RUN go get git.openstack.org/openstack/golang-client/openstack
+RUN go get git.openstack.org/openstack/golang-client/objectstorage/v1
 
 ADD ./ /$GOPATH
 WORKDIR $GOPATH
@@ -38,3 +41,5 @@ ADD entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
+
+CMD ["goprince"]

@@ -2,28 +2,39 @@ package main
 
 import (
 	"errors"
+	"flag"
 	"fmt"
+	"io"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 
-	"flag"
 	"github.com/gin-gonic/gin"
-	"io"
-	"log"
 	"os/signal"
 	"syscall"
+	"io/ioutil"
+
+	"github.com/goprince/src/goprince/storage"
 )
 
 const (
 	TMP_DIR         = "/tmp/"
 	DEFAULT_LOG_DIR = "/var/log/goprince/"
+	DEFAULT_STORAGE = STORAGE_MODE_LOCAL
+)
+
+const (
+	STORAGE_MODE_LOCAL     = "local"
+	STORAGE_MODE_AZURE     = "azure"
+	STORAGE_MODE_OPENSTACK = "openstack"
 )
 
 // shared vars
 var (
-	logDir string
-	stdout bool
+	logDir  string
+	stdout  bool
+	store storage.PrinceStorage
 )
 
 // Default index handler
@@ -132,6 +143,36 @@ func getFormFile(c *gin.Context, parameter string, optional bool) (path string, 
 	return "", nil
 }
 
+func changeStorage(mode string) {
+
+	switch mode {
+	case STORAGE_MODE_AZURE:
+		store = storage.NewAzureClient()
+		log.Println("storeage mode: Azure")
+		break
+	case STORAGE_MODE_OPENSTACK:
+		store = storage.NewOpenstackClient()
+		log.Println("storeage mode: Openstack")
+		break
+	default:
+		log.Println("storeage mode: Local")
+	}
+}
+
+func writeToContainer(c *gin.Context) {
+	path, _ := getFormFile(c, "file", false)
+	filename := c.Param("filename")
+	container := c.Param("application")
+
+	file, err := ioutil.ReadFile(path)
+	if nil != err {
+		c.String(http.StatusInternalServerError, err.Error())
+	}
+	store.Write(filename, container, file)
+	os.Remove(path)
+	c.String(http.StatusCreated, filename)
+}
+
 // Gin router initialization.
 // Bind all API routes with their handler
 func initRouter() *gin.Engine {
@@ -139,11 +180,13 @@ func initRouter() *gin.Engine {
 	router := gin.Default()
 	router.GET("/", indexHandler)
 	router.POST("/generate/:filename", generateHandler)
+	router.POST("/write/:application/:filename", writeToContainer)
 	return router
 }
 
 // Main entrypoint
-// Set gin in release mode if APP_ENV var is set on 'production'
+// Manage command line flags and help message
+// Set up Gin in release mode if APP_ENV var is set on 'production'
 func main() {
 
 	// display help if needed
@@ -157,7 +200,9 @@ func main() {
 
 	// get command line args/options
 	var port int
+	var storageMode string
 	flag.StringVar(&logDir, "log-dir", DEFAULT_LOG_DIR, "Directory where log files must be stored.")
+	flag.StringVar(&storageMode, "storage", DEFAULT_STORAGE, "Set storage mode")
 	flag.BoolVar(&stdout, "stdout", true, "If set, logs are displayed on stdout.")
 	flag.IntVar(&port, "port", 8080, "Set Gin listening port")
 	flag.Parse()
@@ -179,7 +224,8 @@ func main() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
-	// initialize Gin API routes
+	changeStorage(storageMode)
+
 	router := initRouter()
 
 	// manage signals to gracefully stop the application
