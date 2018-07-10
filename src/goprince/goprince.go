@@ -194,6 +194,5 @@ func main() {
 	}()
 
 	// listen for HTTP requests
-	log.Println(port)
 	router.Run(fmt.Sprintf(":%d", port))
 }
