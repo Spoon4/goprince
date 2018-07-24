@@ -150,6 +150,7 @@ func (w *Prince) Generate(outputFile string) (outputPath string, err error) {
 
 // Set log file and create writer for command line output
 // If stdout property is set to true, output is also redirected to stdout
+
 func (w *Prince) SetLogger() (writer io.Writer, err error) {
 
 	f, err := os.OpenFile(w.logFile, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
@@ -224,9 +225,9 @@ func (w *Prince) GetCommandLineArgs(outputFile string) []string {
 		args = append(args, "--pdf-creator="+strconv.Quote(w.pdfCreator))
 	}
 
-	if "" != w.logFile {
-		args = append(args, "--log="+w.logFile)
-	}
+	//if "" != w.logFile {
+	//	args = append(args, "--log="+w.logFile)
+	//}
 	if true == w.debug {
 		args = append(args, "--debug")
 	}
