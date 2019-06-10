@@ -1,0 +1,9 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: spoon4/goprince:latest
+    steps:
+      - checkout
+      - run: make go_format
+      - run: make go_test
